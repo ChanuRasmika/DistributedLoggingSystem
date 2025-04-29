@@ -109,6 +109,13 @@ public class RaftService {
     private void replicateLogs() {
         if (raftState.getCurrentState() == Role.LEADER) {
             ConcurrentLinkedQueue<LogEntry> logBuffer = raftState.getLogBuffer();
+            // NEW: Send all uncommitted logs
+            List<LogEntry> uncommittedLogs = logBuffer.stream()
+                    .filter(entry -> !entry.isCommitted())
+                    .toList();
+            if (uncommittedLogs.isEmpty()) {
+                return; // Skip if no uncommitted logs
+            }
             long lastIndex = logBuffer.size();
             long lastTerm = lastIndex > 0 ? logBuffer.stream().skip(lastIndex - 1).findFirst().map(LogEntry::getTerm).orElse(0L) : 0;
             RaftRequest.EntryAppendRequest request = new RaftRequest.EntryAppendRequest();
@@ -116,6 +123,7 @@ public class RaftService {
             request.setLeaderId(nodeId);
             request.setPrevLogIndex(lastIndex);
             request.setPrevLogTerm(lastTerm);
+            request.setEntries(uncommittedLogs); // NEW: Send uncommitted logs
             request.setLeaderCommit(raftState.getCommitIndex());
 
             peerDiscoveryService.getPeerNodes().forEach((peerId, url) -> { // CHANGED: Use forEach with peerId
@@ -145,7 +153,7 @@ public class RaftService {
         }
     }
 
-    private void startElection() {
+    public void startElection() {
         raftState.setCurrentState(Role.CANDIDATE);
         raftState.setCurrentTerm(raftState.getCurrentTerm() + 1);
         raftState.setVotedTo(null);
@@ -155,7 +163,7 @@ public class RaftService {
         logger.info("Starting election for term {}", raftState.getCurrentTerm());
 
         AtomicInteger votesCount = new AtomicInteger(1);
-        int totalNodes = peerDiscoveryService.getPeerNodes().size() - 1;
+        int totalNodes = peerDiscoveryService.getPeerNodes().size();
         int majority = totalNodes / 2 + 1;
         RaftRequest.Request request = new RaftRequest.Request();
         request.setTerm(raftState.getCurrentTerm());
@@ -393,8 +401,10 @@ public class RaftService {
         request.setLeaderCommit(raftState.getCommitIndex());
 
         AtomicInteger ACK = new AtomicInteger(1); // Count self
-        int totalNodes = peerDiscoveryService.getPeerNodes().size() + 1; // Include self
+        int totalNodes = peerDiscoveryService.getPeerNodes().size();
         int majority = totalNodes / 2 + 1;
+
+        logger.debug("Appending log index {}. Total nodes: {}, Majority needed: {}, Current ACK: {}", entry.getIndex(), totalNodes, majority, ACK.get());
 
         peerDiscoveryService.getPeerNodes().values().forEach(url -> {
             int maxRetries = 3;
@@ -419,6 +429,12 @@ public class RaftService {
                 }
             }
         });
+
+        // NEW: Trigger immediate replication to ensure uncommitted logs are sent
+        if (ACK.get() < majority) {
+            logger.warn("Failed to achieve majority for log index {}. Triggering replication.", entry.getIndex());
+            replicateLogs();
+        }
     }
 
     private void notifyFollowers(long commitIndex) {

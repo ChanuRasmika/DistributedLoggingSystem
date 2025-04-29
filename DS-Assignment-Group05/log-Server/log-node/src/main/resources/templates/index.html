@@ -160,7 +160,7 @@
                 for (let nodeId in data) {
                     rows += `<tr>
                         <td>${nodeId}</td>
-                        <td>${data[nodeId].status}</td>
+                        <td>${data[nodeId].current}</td>
                     </tr>`;
                 }
                 $('#nodeStatusTableBody').html(rows);

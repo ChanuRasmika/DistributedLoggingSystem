@@ -8,7 +8,9 @@ import com.example.lognode.service.RaftService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api")
@@ -30,9 +32,14 @@ public class PeerController {
         return peerDiscoveryService.getPeerNodes();
     }
 
-    @GetMapping("/nodes/status") // NEW: Endpoint for node statuses
-    public Map<String, NodeStatusService.NodeStatus> getNodeStatuses() {
-        return nodeStatusService.getNodeStatuses();
+    @GetMapping("/nodes/status")
+    public Map<String, Map<String, String>> getNodeStatuses() {
+        Map<String, NodeStatusService.NodeStatus> statuses = nodeStatusService.getNodeStatuses();
+        Map<String, Map<String, String>> response = new ConcurrentHashMap<>();
+        statuses.forEach((nodeId, status) ->
+                response.put(nodeId, Collections.singletonMap("current", status.name()))
+        );
+        return response;
     }
 
     @PostMapping("/raft/requestVote")
@@ -45,7 +52,7 @@ public class PeerController {
         return raftService.handleAppendEntries(request);
     }
 
-    // CHANGE: Added endpoint to handle heartbeat requests for Raft leader authority
+    //Added endpoint to handle heartbeat requests for Raft leader authority
     @PostMapping("/raft/heartbeat")
     public RaftRequest.EntryAppendResponse handleHeartbeat(@RequestBody RaftRequest.HeartbeatRequest request) {
         return raftService.handleHeartbeat(request);

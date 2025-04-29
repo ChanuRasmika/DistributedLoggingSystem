@@ -26,4 +26,6 @@ public class LogService {
         logger.info("Saved log entry with index {} to MongoDB", savedEntry.getIndex());
         return savedEntry;
     }
+
+
 }
