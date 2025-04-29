@@ -118,31 +118,6 @@ Test APIs with Postman or `curl`.
   curl http://localhost:55051/api/nodes/status
   ```
 
-## Running Tests
-
-1. **Unit and Integration Tests**:
-
-   - In `log-node` and `log-client`, run:
-
-     ```bash
-     cd log-node
-     mvn test
-     cd ../log-client
-     mvn test
-     ```
-
-   - Tests include:
-     - `RaftServiceTest`: Leader election, log replication.
-     - `LogControllerTest`: Log submission/retrieval.
-     - `LogSenderTest`: High-load submission, failover.
-     - `ChaosTest`: Leader failure, network partitions.
-
-2. **Chaos Testing**:
-
-   - Manually kill a `log-node` instance (e.g., stop `LogNode-55051`).
-   - Check reelection via `/api/raft/state`.
-   - Simulate network delays in `ChaosTest` by modifying mocks.
-
 ## Monitoring
 
 - **Ingestion Rates**: Check `LogSenderTest.testHighLoadSubmission` output (duration for 100 logs).
