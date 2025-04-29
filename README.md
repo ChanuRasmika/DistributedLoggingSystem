@@ -4,14 +4,17 @@ A distributed logging system implementing Raft consensus for fault-tolerant log 
 
 ## Team Members
 
-<table style="min-width: 75px">
-<colgroup><col style="min-width: 25px"><col style="min-width: 25px"><col style="min-width: 25px"></colgroup><tbody><tr class="border-border"><th colspan="1" rowspan="1"><p dir="ltr">Name</p></th><th colspan="1" rowspan="1"><p dir="ltr">Registration Number</p></th><th colspan="1" rowspan="1"><p dir="ltr">Email</p></th></tr><tr class="border-border"><td colspan="1" rowspan="1"><p dir="ltr">MENDIS M C R</p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23173118 </p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23173118@my.sliit.lk</p></td></tr><tr class="border-border"><td colspan="1" rowspan="1"><p dir="ltr">LIYANAGE N.S.D</p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23285606</p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23285606@my.sliit.lk</p></td></tr><tr class="border-border"><td colspan="1" rowspan="1"><p dir="ltr">RUPASINGHE P W K W</p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23283312 </p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23283312@my.sliit.lk</p></td></tr><tr class="border-border"><td colspan="1" rowspan="1"><p dir="ltr">RANASINGHE K W R L V</p><p></p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23225510</p></td><td colspan="1" rowspan="1"><p dir="ltr">IT23225510@my.sllit.lk</p></td></tr></tbody>
-</table>
+| Name                      | Registration Number | Email                      |
+|---------------------------|--------------------|----------------------------|
+| MENDIS M C R              | IT23173118         | IT23173118@my.sliit.lk     |
+| LIYANAGE N.S.D            | IT23285606         | IT23285606@my.sliit.lk     |
+| RUPASINGHE P W K W        | IT23283312         | IT23283312@my.sliit.lk     |
+| RANASINGHE K W R L V      | IT23225510         | IT23225510@my.sliit.lk     |
 
 ## Tech Stack
 
 - **Java 21**: Backend development
-- **Spring Boot**: Framework for `log-node` and `log-client`
+- **Spring Boot**: Framework for `eureka-server`, `log-node`, and `log-client`
 - **MongoDB**: Log storage
 - **Eureka**: Service discovery
 - **HTML/CSS/JavaScript**: Front-end (Tailwind CSS, Axios)
@@ -25,7 +28,7 @@ A distributed logging system implementing Raft consensus for fault-tolerant log 
 
 - IntelliJ IDEA
 - Java 21
-- MongoDB 
+- MongoDB
 - Postman
 - Maven
 - Git
@@ -35,13 +38,13 @@ A distributed logging system implementing Raft consensus for fault-tolerant log 
 1. **Clone Repository**:
 
    ```bash
-   https://github.com/ChanuRasmika/DistributedLoggingSystem.git
+   git clone https://github.com/ChanuRasmika/DistributedLoggingSystem.git
    ```
 
 2. **Install Dependencies**:
 
-   - Open `logging-system` in IntelliJ.
-   - Run `mvn clean install` for both modules.
+   - Open `DistributedLoggingSystem` in IntelliJ.
+   - Run `mvn clean install` in the root directory (covers `eureka-server`, `log-node`, `log-client`).
 
 3. **Configure MongoDB**:
 
@@ -50,42 +53,42 @@ A distributed logging system implementing Raft consensus for fault-tolerant log 
      ```bash
      docker run -d -p 27017:27017 mongo
      ```
+
    - Ensure `logDb` database is accessible.
-
-4. **Configure Eureka**:
-
-   - Start Eureka server (port 8761):
-
-     ```bash
-     cd eureka-server
-     mvn spring-boot:run
-     ```
-   - Verify at `http://localhost:8761`.
 
 ## Running the Prototype
 
-### Configure Multiple `log-node` Instances
+### 1. Run Eureka Server
+
+- **Module**: `eureka-server`
+- **Port**: 8761
+- **Steps**:
+  - Open `eureka-server` in IntelliJ.
+  - Run `com.example.eurekaserver.EurekaServerApplication`.
+  - Verify at `http://localhost:8761`.
+
+### 2. Configure Multiple `log-node` Instances
 
 Run 4 `log-node` instances on ports 55051, 55052, 55053, 55054.
 
-1. **Edit Configuration in IntelliJ**:
+- **Edit Configuration in IntelliJ**:
+  - For each instance:
+    - Go to `Run > Edit Configurations > Add New > Spring Boot`.
+    - Set `Main class`: `com.example.lognode.LogNodeApplication`.
+    - Add VM Options: `-Dserver.port=55051` (repeat for 55052, 55053, 55054).
+    - Name configurations: `LogNode-55051`, `LogNode-55052`, etc.
+- **Run Instances**:
+  - Start each configuration (`LogNode-55051`, `LogNode-55052`, etc.).
+  - Verify registration at `http://localhost:8761`.
 
-   - For each instance:
-     - Go to `Run > Edit Configurations > Add New > Spring Boot`.
-     - Set `Main class`: `com.example.lognode.LogNodeApplication`.
-     - Add Environment Variables options: `SERVER_PORT=55051` (repeat for 55052, 55053, 55054).
-     - Name configurations: `LogNode-55051`, `LogNode-55052`, etc.
+### 3. Run `log-client`
 
-2. **Run** `log-node` **Instances**:
-
-   - Start each configuration (`LogNode-55051`, `LogNode-55052`, etc.).
-   - Verify registration at `http://localhost:8761`.
-
-3. **Run** `log-client`:
-
-   - Open `log-client` in IntelliJ.
-   - Run `com.example.logclient.LogClientApplication` (default port: 8080).
-   - Access front-end at `http://localhost:< SERVER_PORT>`. (SERVER_PORT - any port that you start the log-node)
+- **Module**: `log-client`
+- **Port**: 8080
+- **Steps**:
+  - Open `log-client` in IntelliJ.
+  - Run `com.example.logclient.LogClientApplication`.
+  - Access front-end at `http://localhost:8080`.
 
 ## Using API Endpoints
 
@@ -122,8 +125,12 @@ Test APIs with Postman or `curl`.
    - In `log-node` and `log-client`, run:
 
      ```bash
+     cd log-node
+     mvn test
+     cd ../log-client
      mvn test
      ```
+
    - Tests include:
      - `RaftServiceTest`: Leader election, log replication.
      - `LogControllerTest`: Log submission/retrieval.
@@ -138,7 +145,7 @@ Test APIs with Postman or `curl`.
 
 ## Monitoring
 
-- **Ingestion Rates**: Check `LogSenderTest.testHighLoadSubmission` output (e.g., duration for 100 logs).
+- **Ingestion Rates**: Check `LogSenderTest.testHighLoadSubmission` output (duration for 100 logs).
 - **Replication Lag**: Compare submission vs. MongoDB save timestamps in tests.
 - **Consistency**: Query `/api/logs` across nodes to verify identical logs.
 - **Dynamic Joining**: Start a new `log-node` instance and check Eureka.
@@ -149,5 +156,3 @@ Test APIs with Postman or `curl`.
 - **MongoDB Errors**: Verify `mongod` is running and `logDb` is accessible.
 - **API Failures**: Check logs for `Failed to replicate log` or `PeerDiscoveryService` issues.
 - **Test Failures**: Share `PeerDiscoveryService.java` or logs for debugging.
-
-## 
