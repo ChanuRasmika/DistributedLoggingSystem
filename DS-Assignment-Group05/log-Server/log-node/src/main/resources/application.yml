@@ -1,0 +1,22 @@
+server:
+  port: 0
+spring:
+  application:
+    name: log-node
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/logDb}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}
+    prefer-ip-address: true
+    # Remove home-page-url to let Eureka derive it
+raft:
+  heartbeatInterval: 50
+  checkInterval: 100
+
