@@ -13,10 +13,10 @@ A distributed logging system implementing Raft consensus for fault-tolerant log 
 
 ## Member Work
 
-- **Consensus and Agreement Algorithms **: MENDIS M C R
+- **Consensus and Agreement Algorithms**: MENDIS M C R
 - **Time Synchronization**: LIYANAGE N.S.D
 - **Data Replication and Consistency**:RANASINGHE K W R L V
-- **Fault Tolerance **:RUPASINGHE P W K W    
+- **Fault Tolerance**:RUPASINGHE P W K W    
 
 ## Tech Stack
 
