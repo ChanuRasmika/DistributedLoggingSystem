@@ -11,6 +11,13 @@ A distributed logging system implementing Raft consensus for fault-tolerant log 
 | RUPASINGHE P W K W        | IT23283312         | IT23283312@my.sliit.lk     |
 | RANASINGHE K W R L V      | IT23225510         | IT23225510@my.sliit.lk     |
 
+## Member Work
+
+- **Consensus and Agreement Algorithms **: MENDIS M C R
+- **Time Synchronization**: LIYANAGE N.S.D
+- **Data Replication and Consistency**:RANASINGHE K W R L V
+- **Fault Tolerance **:RUPASINGHE P W K W    
+
 ## Tech Stack
 
 - **Java 21**: Backend development
