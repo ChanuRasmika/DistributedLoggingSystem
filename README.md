@@ -82,7 +82,7 @@ Run 4 `log-node` instances on ports 55051, 55052, 55053, 55054.
   - For each instance:
     - Go to `Run > Edit Configurations > Add New > Spring Boot`.
     - Set `Main class`: `com.example.lognode.LogNodeApplication`.
-    - Add VM Options: `-Dserver.port=55051` (repeat for 55052, 55053, 55054).
+    - Add VM Options: `SERVER_PORT=55051` (repeat for 55052, 55053, 55054).
     - Name configurations: `LogNode-55051`, `LogNode-55052`, etc.
 - **Run Instances**:
   - Start each configuration (`LogNode-55051`, `LogNode-55052`, etc.).
